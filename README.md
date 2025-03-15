@@ -53,7 +53,7 @@ Maintenant que tous les réseaux sont configurés, nous allons configurer le **S
 
 Nous allons déployer un **serveur 3CX** sur le **Site A**. Avant toute chose, il faut créer une licence chez **3CX** puisqu’il s’agit d’une **solution propriétaire**.
 
-[Créer]: https://login.3cx.com/Account/Login	"ff"
+[Créer un compte puis se connecter sur **3CX**.](https://login.3cx.com/Account/Login)
 
 
 
