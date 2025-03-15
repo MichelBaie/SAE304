@@ -26,9 +26,9 @@ Sur **VMWare**, nous reproduisons cette infrastructure avec cette liste de **VM 
 
 Pour virtualiser tout cela, nous allons d’abord définir sur **VMWare** les différents réseaux.
 
-![image-20250315160945017](img/image-20250315160945017.png)
+<img src="img/image-20250315160945017.png" alt="image-20250315160945017" style="zoom:80%;" /> <img src="img/image-20250315175512660.png" alt="image-20250315175512660" style="zoom:80%;" />
 
-![image-20250315174815323](img/image-20250315174815323.png)
+
 
 
 
