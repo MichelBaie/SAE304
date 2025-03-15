@@ -55,6 +55,34 @@ Nous allons déployer un **serveur 3CX** sur le **Site A**. Avant toute chose, i
 
 [Créer un compte puis se connecter sur **3CX**.](https://login.3cx.com/Account/Login)
 
+![image-20250315182300263](img/image-20250315182300263.png)
+
+Cliquer sur **ADD SYSTEM**.
+
+![image-20250315182337166](img/image-20250315182337166.png)
+
+Dans notre cas, il s’agit d’une installation **On Premise**, à savoir hébergé dans notre propre environnement.
+
+![image-20250315182627201](img/image-20250315182627201.png)
+
+Choisissez ici un **hostname**, soit un nom pour votre serveur **3CX**.
+
+Il y a ici un semblant de pré-configuration. Nous choisissons ici le nombre de chiffres dont les **numéros courts** seront composés.
+
+Les **numéros courts** (ou plus couramment **extensions**) sont les numéros **internes** aux utilisateurs. 
+
+![image-20250315182642824](img/image-20250315182642824.png)
+
+Nous pouvons tout laisser par défaut ici.
+
+![image-20250315182838688](img/image-20250315182838688.png)
+
+Une fois la licence configurée, nous choisissons la plateforme sur laquelle installer le **serveur 3CX** (choisir **Windows** ici).
+
+![image-20250315183005744](img/image-20250315183005744.png)
+
+Télécharger le serveur sous format **.exe** ainsi que le fichier de configuration proposé à **l’étape 3**. 
+
 
 
 
