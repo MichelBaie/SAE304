@@ -45,7 +45,7 @@ Penser à bien désactiver le service **DHCP** (nous en déploierons un par site
 
 Pour le **LAN_Switch**, spécifiez le réseau en **Bridged** vers l’interface réseau de votre **PC** qui sera branché sur le **switch**.
 
-Maintenant que tous les réseaux sont configurés, nous allons configurer le **Site A**
+Maintenant que tous les réseaux sont configurés, nous allons les configurer sur les **machines virtuelles**.
 
 
 
@@ -85,7 +85,7 @@ Télécharger le serveur sous format **.exe** ainsi que le fichier de configurat
 
 
 
-
+![image-20250315184619730](img/image-20250315184619730.png)
 
 
 
