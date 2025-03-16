@@ -151,8 +151,8 @@ Nous définissons de la même manière une **zone principale** ayant pour nom **
 
 Dans la zone **sitea.local**, créer **deux hôtes** avec leur adresse IP respective : 
 
-- **VOTRE_FQDN**
-- **stormshield**.sitea.local
+- **VOTRE_FQDN** -> **192.168.1.254**
+- **stormshield**.sitea.local -> **192.168.1.1**
 
 <img src="img/image-20250316132210905.png" alt="image-20250316132210905" style="zoom:67%;" />
 
@@ -163,9 +163,15 @@ Dans la zone **siteb.local**, rajouter de la même manière une entrée pour :
 - **freepbx**.siteb.local -> **1.2.3.2**
 - **stormshield**.siteb.local -> **1.2.3.2**
 
+![image-20250316140729764](img/image-20250316140729764.png)
+
 >  [!NOTE]
 >
 > L’adresse IP de **freepbx**.siteb.local est la même que le **stormshield** car nous allons faire une **translation d’adresse (NAT)**.
+
+
+
+### Configuration du serveur 3CX
 
 Nous allons déployer un **serveur 3CX** sur le **Site A**. Avant toute chose, il faut créer une licence chez **3CX** puisqu’il s’agit d’une **solution propriétaire**.
 
@@ -209,9 +215,21 @@ Une fois la licence configurée, nous choisissons la plateforme sur laquelle ins
 
 Télécharger le serveur sous format **.exe** ainsi que le fichier de configuration proposé à **l’étape 3**. 
 
-Sur la VM **3CX_SiteA**, installer le **3CXPhoneSystem** et choisir la **configuration web**.
+> [!TIP]
+>
+> Il devrait déjà être sur le Bureau de la **VM 3CX_Site_A**.
+
+Sur la VM **3CX_Site_A**, installer le **3CXPhoneSystem** et choisir la **configuration web**.
 
 ![image-20250315184619730](img/image-20250315184619730.png)
+
+>  [!WARNING]
+>
+> Il peut arriver que le **service Web** ne soit pas automatiquement démarré. Si vous ne parvenez pas à aller sur l’interface web, activez le service dans : ![image-20250316145619707](img/image-20250316145619707.png)![image-20250316145732474](img/image-20250316145732474.png)
+>
+> 
+
+
 
 Suivre le guide d’installation puis y **importer le fichier de configuration**.
 
