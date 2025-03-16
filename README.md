@@ -265,7 +265,7 @@ Suivre le guide d’installation et y **importer le fichier de configuration**.
 
 Le **serveur 3CX** vous demandera un **certificat** et une **clé privée**. Pour se faire, allez sur votre hôte **Debian** et exécutez la commande : 
 
-```
+```bash
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/C=FR/ST=Ile-de-France/L=Villetaneuse/O=USPN/CN=HOSTNAME.sitea.local" -keyout private.key  -out certificate.crt
 ```
 
@@ -279,7 +279,7 @@ Vous devriez retrouver dans votre répertoire personnel deux fichiers :
 
 Glissez ces fichiers dans votre **VM 3CX** puis spécifiez les chemins : 
 
-```
+```batch
 C:\Users\Administrateur\Desktop\certificate.crt
 C:\Users\Administrateur\Desktop\private.key
 ```
@@ -300,7 +300,7 @@ Une fois la configuration importée, nous pouvons accéder à l’interface web 
 >
 > Sur un terminal **PowerShell**, exécutez 
 >
-> ```
+> ```batch
 > ipconfig
 > ipconfig /renew
 > ```
@@ -313,3 +313,10 @@ Une fois la configuration importée, nous pouvons accéder à l’interface web 
 
 Le **serveur 3CX** est maintenant opérationnel et accessible via **HTTPS**.
 
+<img src="img/image-20250317002333154.png" alt="image-20250317002333154" style="zoom:67%;" />
+
+>  [!NOTE]
+>
+> Les identifiants sont ceux donnés lors de la création de licence.
+
+Familiarisez-vous avec l’interface, notamment le menu **Admin**, trouvable en bas des onglets latéraux.<img src="img/image-20250317003114267.png" alt="image-20250317003114267" style="zoom:50%;" />
