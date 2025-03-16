@@ -134,7 +134,7 @@ Pour créer la réservation, cliquer sur **Nouvelle réservation** sur l’ongle
 
 ![image-20250316113757564](img/image-20250316113757564.png)
 
-Renseignez le nom de la réservation, l’adresse IP que l’on veut fixer ainsi que l’adresse MAC de la machine. ![image-20250316114034388](img/image-20250316114034388.png)
+Renseignez le nom de la réservation, l’adresse IP que l’on veut fixer ainsi que l’adresse MAC de la machine.![image-20250316114034388](img/image-20250316114034388.png)
 
 >  [!IMPORTANT]
 > De la même manière, fixer l’adresse du **pare-feu Stormshield** à **192.168.1.1**.
@@ -145,13 +145,9 @@ Le service **DHCP** est maintenant opérationnel.
 
 ### Configuration du DNS
 
-Nous allons maintenant configurer le **serveur DNS**.
+Nous allons maintenant configurer le **serveur DNS**.<img src="img/image-20250316112809706.png" alt="image-20250316112809706" style="zoom:67%;" />
 
-<img src="img/image-20250316112809706.png" alt="image-20250316112809706" style="zoom:67%;" />
-
-Puisqu’il y a **deux sites**, il faudra donc créer **deux zones DNS**.
-
-![image-20250316113053659](img/image-20250316113053659.png)
+Puisqu’il y a **deux sites**, il faudra donc créer **deux zones DNS**.![image-20250316113053659](img/image-20250316113053659.png)
 
 Cliquez sur **Nouvelle zone…**sur l’onglet **Zones de recherche directes**.
 
@@ -175,9 +171,10 @@ Dans la zone **sitea.local**, créer **deux hôtes** avec leur adresse IP respec
 Dans la zone **siteb.local**, rajoutez de la même manière une entrée pour : 
 
 - **freepbx**.siteb.local -> **1.2.3.2**
+
 - **stormshield**.siteb.local -> **1.2.3.2**
 
-![image-20250316140729764](img/image-20250316140729764.png)
+  ![image-20250316140729764](img/image-20250316140729764.png)
 
 >  [!NOTE]
 >
@@ -189,13 +186,9 @@ Dans la zone **siteb.local**, rajoutez de la même manière une entrée pour :
 
 Nous allons déployer un **serveur 3CX** sur le **Site A**. Avant toute chose, il faut créer une licence chez **3CX** puisqu’il s’agit d’une **solution propriétaire**.
 
-[Créer un compte puis se connecter sur **3CX**.](https://login.3cx.com/Account/Login)
+[Créer un compte puis se connecter sur **3CX**.](https://login.3cx.com/Account/Login)![image-20250315182300263](img/image-20250315182300263.png)
 
-![image-20250315182300263](img/image-20250315182300263.png)
-
-Cliquer sur **ADD SYSTEM**.
-
-![image-20250315182337166](img/image-20250315182337166.png)
+Cliquer sur **ADD SYSTEM**.![image-20250315182337166](img/image-20250315182337166.png)
 
 Dans notre cas, il s’agit d’une installation **On Premise**, à savoir hébergé dans notre propre environnement.
 
@@ -319,4 +312,40 @@ Le **serveur 3CX** est maintenant opérationnel et accessible via **HTTPS**.
 >
 > Les identifiants sont ceux donnés lors de la création de licence.
 
-Familiarisez-vous avec l’interface, notamment le menu **Admin**, trouvable en bas des onglets latéraux.<img src="img/image-20250317003114267.png" alt="image-20250317003114267" style="zoom: 25%;" />
+Familiarisez-vous avec l’interface, notamment le menu **Admin**, trouvable en bas des onglets latéraux.
+
+![image-20250317003311824](img/image-20250317003311824.png)
+
+### Ajout d’extensions
+
+Nous allons maintenant ajouter des utilisateurs.
+
+Allez dans **Utilisateurs**, vous y verrez déjà un utilisateur (vous).![image-20250317003516382](img/image-20250317003516382.png)
+
+Vous pouvez en créer un via **Ajouter un utilisateur**.![image-20250317003734278](img/image-20250317003734278.png)
+
+Renseignez les informations relatives à votre nouvel utilisateur.
+
+>  [!NOTE]
+>
+> L’extension représente le numéro court de l’utilisateur - le numéro que les autres utilisateurs **internes** composeront.
+>
+> Notez que le **numéro SDA** (***S**élection **D**irecte à **l’A**rrivée*) représente le **numéro long** - le numéro que les autres utilisateurs **externes** (via un **Trunk SIP** que nous configurerons plus tard) composeront.
+
+### Configuration du Softphone
+
+Pour configurer un **softphone**, il faut sélectionner l’utilisateur sur **3CX** qui va l’utiliser.
+
+Allez sur **Téléphone IP**.![image-20250317004235908](img/image-20250317004235908.png)
+
+Pour configurer un **softphone**, il faut sélectionner **Je configurerai le téléphone moi-même**.![image-20250317004338792](img/image-20250317004338792.png)
+
+Il vous sera demandé par quelle interface le softphone doit-il communiquer avec le **serveur 3CX**, utilisez le **FQDN**.![image-20250317004433553](img/image-20250317004433553.png)
+
+
+
+Il sera ainsi affiché les identifiants de connexion pour votre **softphone**.
+
+> [!NOTE] 
+>
+> Notez ces identifiants pour la configuration du **softphone**.![image-20250317004512944](img/image-20250317004512944.png)
