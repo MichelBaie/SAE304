@@ -319,4 +319,4 @@ Le **serveur 3CX** est maintenant opérationnel et accessible via **HTTPS**.
 >
 > Les identifiants sont ceux donnés lors de la création de licence.
 
-Familiarisez-vous avec l’interface, notamment le menu **Admin**, trouvable en bas des onglets latéraux.<img src="img/image-20250317003114267.png" alt="image-20250317003114267" style="zoom:50%;" />
+Familiarisez-vous avec l’interface, notamment le menu **Admin**, trouvable en bas des onglets latéraux.<img src="img/image-20250317003114267.png" alt="image-20250317003114267" style="zoom: 25%;" />
