@@ -55,6 +55,8 @@ Ici, on aura une interface dans le réseau **WAN** et l’autre dans le **LAN_Si
 
 ## Configuration du Site A
 
+### Configuration du DHCP
+
 Nous allons d’abord procéder à la configuration du serveur **DHCP**.
 
 >  [!TIP]
@@ -108,9 +110,62 @@ Nous allons configurer dès maintenant les **options DHCP**.
 
 Activer **l’étendue**.
 
+En général, il est peu pratique qu’un **routeur/pare-feu** ou qu’un quelconque **serveur** possède une adresse IP qui varie dans le temps. Pour pallier à ce souci, nous allons **réserver** une adresse IP au **pare-feu** et au **serveur 3CX**.
+
+Sur la **VM Stormshield** et la **VM 3CX**, aller dans les paramètres réseau et recueillir **l’adresse MAC** de chaque interface **<u>dans le réseau LAN_SiteA</u>**.
+
+<img src="img/image-20250316113603358.png" alt="image-20250316113603358" style="zoom: 80%;" />
+
+Pour créer la réservation, cliquer sur **Nouvelle réservation** sur l’onglet **Réservations** :
+
+![image-20250316113757564](img/image-20250316113757564.png)
+
+Renseigner le nom de la réservation, ’adresse IP que l’on veut fixer ainsi que l’adresse MAC de la machine. ![image-20250316114034388](img/image-20250316114034388.png)
+
+>  [!IMPORTANT]
+> De la même manière, fixer l’adresse du **pare-feu Stormshield** à **192.168.1.1**.
+
+
+
 Le service **DHCP** est maintenant opérationnel.
 
+### Configuration du DNS
 
+Nous allons maintenant configurer le **serveur DNS**.
+
+<img src="img/image-20250316112809706.png" alt="image-20250316112809706" style="zoom:67%;" />
+
+Puisqu’il y a **deux sites**, il faudra donc créer **deux zones DNS**.
+
+![image-20250316113053659](img/image-20250316113053659.png)
+
+Cliquer sur **Nouvelle zone…**sur l’onglet **Zones de recherche directes**.
+
+Nous allons définir une **zone principale** ayant pour nom **sitea.local**.
+
+>  [!NOTE]
+>
+> Nous autorisons les **mises à jour dynamiques** afin de pouvoir mettre dynamiquement à jour la **base DNS** lors d’un **bail DHCP**.
+
+Nous définissons de la même manière une **zone principale** ayant pour nom **siteb.local**.
+
+Dans la zone **sitea.local**, créer **deux hôtes** avec leur adresse IP respective : 
+
+- **VOTRE_FQDN**
+- **stormshield**.sitea.local
+
+<img src="img/image-20250316132210905.png" alt="image-20250316132210905" style="zoom:67%;" />
+
+![image-20250316132405205](img/image-20250316132405205.png)
+
+Dans la zone **siteb.local**, rajouter de la même manière une entrée pour : 
+
+- **freepbx**.siteb.local -> **1.2.3.2**
+- **stormshield**.siteb.local -> **1.2.3.2**
+
+>  [!NOTE]
+>
+> L’adresse IP de **freepbx**.siteb.local est la même que le **stormshield** car nous allons faire une **translation d’adresse (NAT)**.
 
 Nous allons déployer un **serveur 3CX** sur le **Site A**. Avant toute chose, il faut créer une licence chez **3CX** puisqu’il s’agit d’une **solution propriétaire**.
 
