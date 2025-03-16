@@ -8,7 +8,7 @@ Rédiger une introduction
 
 ## Pré-requis
 
-- **VMWare Workstation Pro** : Pour créer et gérer les machines virtuelles. VMWare est désormais gratuit pour les particuliers et étudiants. Il intègre automatiquement les outils invités permettant le redimensionnement automatique de l'écran et la gestion simplifiée du presse-papier. Les installateurs pour Linux ou Windows sont disponibles sur le [CDN de VMWare](https://softwareupdate.vmware.com/cds/vmw-desktop/ws/)
+- **VMware Workstation Pro** : Pour créer et gérer les machines virtuelles. VMWare est désormais gratuit pour les particuliers et étudiants. Il intègre automatiquement les outils invités permettant le redimensionnement automatique de l'écran et la gestion simplifiée du presse-papier. Les installateurs pour Linux ou Windows sont disponibles sur le [CDN de VMWare](https://softwareupdate.vmware.com/cds/vmw-desktop/ws/)
 
 ## Infrastructure déployée 
 
@@ -18,7 +18,7 @@ Cette infrastructure représente une interconnexion entre **deux sites différen
 
 Nous n’allons pas reproduire physiquement cette infrastructure.
 
-Sur **VMWare**, nous reproduisons cette infrastructure avec cette liste de **VM (Virtual Machines / Machines virtuelles)**.
+Sur **VMware**, nous reproduisons cette infrastructure avec cette liste de **VM (Virtual Machines / Machines virtuelles)**.
 
 ![image-20250315174500470](img/image-20250315174500470.png)
 
@@ -39,7 +39,7 @@ Via le bouton **Add Network **(et **Rename Network** pour les renommer à souhai
 
 ![image-20250315181505324](img/image-20250315181505324.png)
 
-Penser à bien désactiver le service **DHCP** (nous en déploierons un par site.). Spécifier également l’adresse du réseau sur chaque **LAN**.
+Pensez à bien désactiver le service **DHCP** (nous en déploierons un par site.). Spécifiez également l’adresse du réseau sur chaque **LAN**.
 
 ![image-20250315181630303](img/image-20250315181630303.png)
 
@@ -51,9 +51,13 @@ Maintenant que tous les réseaux sont configurés, <u>il faut les ajouter sur le
 
 ![image-20250316002340606](img/image-20250316002340606.png)
 
-Ici, on aura une interface dans le réseau **WAN** et l’autre dans le **LAN_SiteA**.
+Ici, nous aurons une interface dans le réseau **WAN** et l’autre dans le **LAN_SiteA**.
 
 ## Configuration du Site A
+
+>  [!CAUTION]
+>
+> Ne démarrez pas encore la machine **3CX**.
 
 ### Configuration du DHCP
 
@@ -94,25 +98,35 @@ Cela nous permettra de créer une **pool DHCP**.
 
 ![image-20250316023021507](img/image-20250316023021507.png)
 
-Donner un nom à l’étendue (p. ex: **sitea.local**) : 
+Donnez un nom à l’étendue (p. ex: **sitea.local**) : 
 
 ![image-20250316023148591](img/image-20250316023148591.png)
 
-Attribuer la plage d’adresse **192.168.1.100 -> 192.168.1.200**. Le masque sera **255.255.255.0 (/24 CIDR)**
+Attribuez la plage d’adresse **192.168.1.100 -> 192.168.1.200**. Le masque sera **255.255.255.0 (/24 CIDR)**
 
  ![image-20250316023318051](img/image-20250316023318051.png)
 
 Nous allons configurer dès maintenant les **options DHCP**.
 
-- **Routeur (passerelle par défaut) : <u>192.168.1.254</u>**
+- **Routeur (passerelle par défaut) : <u>192.168.1.1</u>**
+
+  ![image-20250317001555551](img/image-20250317001555551.png)
+
+  > [!CAUTION]
+  >
+  > Attention à bien cliquer sur **Ajouter** pour que l’entrée soit enregistrée.
+
 - **Domaine parent : <u>sitea.local</u>**
+
 - **Adresse IP du serveur DNS : <u>192.168.1.20</u>**
+
+  ![image-20250317001831943](img/image-20250317001831943.png)
 
 Activer **l’étendue**.
 
 En général, il est peu pratique qu’un **routeur/pare-feu** ou qu’un quelconque **serveur** possède une adresse IP qui varie dans le temps. Pour pallier à ce souci, nous allons **réserver** une adresse IP au **pare-feu** et au **serveur 3CX**.
 
-Sur la **VM Stormshield** et la **VM 3CX**, aller dans les paramètres réseau et recueillir **l’adresse MAC** de chaque interface **<u>dans le réseau LAN_SiteA</u>**.
+Sur la **VM Stormshield** et la **VM 3CX**, allez dans les paramètres réseau et recueillir **l’adresse MAC** de chaque interface **<u>dans le réseau LAN_SiteA</u>**.
 
 <img src="img/image-20250316113603358.png" alt="image-20250316113603358" style="zoom: 80%;" />
 
@@ -120,7 +134,7 @@ Pour créer la réservation, cliquer sur **Nouvelle réservation** sur l’ongle
 
 ![image-20250316113757564](img/image-20250316113757564.png)
 
-Renseigner le nom de la réservation, ’adresse IP que l’on veut fixer ainsi que l’adresse MAC de la machine. ![image-20250316114034388](img/image-20250316114034388.png)
+Renseignez le nom de la réservation, l’adresse IP que l’on veut fixer ainsi que l’adresse MAC de la machine. ![image-20250316114034388](img/image-20250316114034388.png)
 
 >  [!IMPORTANT]
 > De la même manière, fixer l’adresse du **pare-feu Stormshield** à **192.168.1.1**.
@@ -139,7 +153,7 @@ Puisqu’il y a **deux sites**, il faudra donc créer **deux zones DNS**.
 
 ![image-20250316113053659](img/image-20250316113053659.png)
 
-Cliquer sur **Nouvelle zone…**sur l’onglet **Zones de recherche directes**.
+Cliquez sur **Nouvelle zone…**sur l’onglet **Zones de recherche directes**.
 
 Nous allons définir une **zone principale** ayant pour nom **sitea.local**.
 
@@ -158,7 +172,7 @@ Dans la zone **sitea.local**, créer **deux hôtes** avec leur adresse IP respec
 
 ![image-20250316132405205](img/image-20250316132405205.png)
 
-Dans la zone **siteb.local**, rajouter de la même manière une entrée pour : 
+Dans la zone **siteb.local**, rajoutez de la même manière une entrée pour : 
 
 - **freepbx**.siteb.local -> **1.2.3.2**
 - **stormshield**.siteb.local -> **1.2.3.2**
@@ -187,7 +201,7 @@ Dans notre cas, il s’agit d’une installation **On Premise**, à savoir hébe
 
 ![image-20250316021828597](img/image-20250316021828597.png)
 
-Choisir ici un **hostname**, soit un nom pour votre serveur **3CX**.
+Choisissez ici un **hostname**, soit un nom pour votre serveur **3CX**.
 
 > [!WARNING]
 >
@@ -213,29 +227,89 @@ Une fois la licence configurée, nous choisissons la plateforme sur laquelle ins
 >
 > Penser à bien noter le mot de passe.
 
-Télécharger le serveur sous format **.exe** ainsi que le fichier de configuration proposé à **l’étape 3**. 
+Téléchargez le serveur sous format **.exe** ainsi que le fichier de configuration proposé à **l’étape 3** (ou copiez le lien proposé - cela revient au même que le fichier de configuration). 
+
+
+
+>  [!CAUTION]
+>
+> Lors de la première configuration de la **VM 3CX**, il est nécessaire que la **VM** aie un accès à Internet pour qu’elle puisse activer le **FQDN** auprès de 3CX.
+>
+> <u>Configurer temporairement la carte réseau en **NAT** (Il faut donc que la machine hôte aie un accès internet également.)</u>
+>
+> ![image-20250316220234709](img/image-20250316220234709.png)
+>
+> Vous pouvez ensuite démarrer la **VM**.
 
 > [!TIP]
 >
 > Il devrait déjà être sur le Bureau de la **VM 3CX_Site_A**.
 
-Sur la VM **3CX_Site_A**, installer le **3CXPhoneSystem** et choisir la **configuration web**.
+
+
+Sur la VM **3CX_Site_A**, installer **3CXPhoneSystem** et choisir la **configuration en ligne de commandes**.
 
 ![image-20250315184619730](img/image-20250315184619730.png)
 
->  [!WARNING]
+
+
+> [!WARNING] 
 >
-> Il peut arriver que le **service Web** ne soit pas automatiquement démarré. Si vous ne parvenez pas à aller sur l’interface web, activez le service dans : ![image-20250316145619707](img/image-20250316145619707.png)![image-20250316145732474](img/image-20250316145732474.png)
+> Si vous rencontrez encore des soucis pour accéder au **serveur 3CX**, tentez de redémarrer la **VM 3CX**.
 >
-> 
+> En parallèle, assurez-vous de bien pouvoir communiquer en **DNS**(*nslookup*), **IP**(*ping*)…
+
+L’interface de **3CX** est disponible sur le port **5015** à l’adresse : http://localhost:5015/ 
+
+Suivre le guide d’installation et y **importer le fichier de configuration**.
+
+Le **serveur 3CX** vous demandera un **certificat** et une **clé privée**. Pour se faire, allez sur votre hôte **Debian** et exécutez la commande : 
+
+```
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/C=FR/ST=Ile-de-France/L=Villetaneuse/O=USPN/CN=HOSTNAME.sitea.local" -keyout private.key  -out certificate.crt
+```
+
+>  [!CAUTION]
+>
+> Changez le **CN** (**C**ommon **N**ame) dans la commande par votre **FQDN**.
+
+Vous devriez retrouver dans votre répertoire personnel deux fichiers : 
+
+![image-20250316224257208](img/image-20250316224257208.png)
+
+Glissez ces fichiers dans votre **VM 3CX** puis spécifiez les chemins : 
+
+```
+C:\Users\Administrateur\Desktop\certificate.crt
+C:\Users\Administrateur\Desktop\private.key
+```
+
+> [!TIP]
+>
+> Si vous glissez les fichiers sur le Bureau, vous pouvez copier directement ces chemins.
+
+![image-20250316235930992](img/image-20250316235930992.png)
 
 
 
-Suivre le guide d’installation puis y **importer le fichier de configuration**.
+Une fois la configuration importée, nous pouvons accéder à l’interface web de **3CX**.
 
-Une fois la configuration importée, nous pouvons accéder à l’interface web de **3CX** via le **FQDN** que nous avons renseigné lors de la création de la licence. 
+> [!CAUTIOn]
+>
+> Repassez maintenant l’interface réseau de la **VM 3CX** en **LAN_SiteA**
+>
+> Sur un terminal **PowerShell**, exécutez 
+>
+> ```
+> ipconfig
+> ipconfig /renew
+> ```
+>
+> ![image-20250317002054323](img/image-20250317002054323.png)
+>
+> Confirmez bien que **l’adresse IP** de la **VM 3CX** est bien **192.168.1.254**
+>
+> Notez que la **VM** n’aura plus accès à **Internet** à partir de ce moment.
 
-
-
-
+Le **serveur 3CX** est maintenant opérationnel et accessible via **HTTPS**.
 
