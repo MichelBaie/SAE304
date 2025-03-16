@@ -39,7 +39,7 @@ Via le bouton **Add Network **(et **Rename Network** pour les renommer à souhai
 
 ![image-20250315181505324](img/image-20250315181505324.png)
 
-Penser à bien désactiver le service **DHCP** (nous en déploierons un par site.). Spécifiez également l’adresse du réseau sur chaque **LAN**.
+Penser à bien désactiver le service **DHCP** (nous en déploierons un par site.). Spécifier également l’adresse du réseau sur chaque **LAN**.
 
 ![image-20250315181630303](img/image-20250315181630303.png)
 
@@ -55,6 +55,32 @@ Ici, on aura une interface dans le réseau **WAN** et l’autre dans le **LAN_Si
 
 ## Configuration du Site A
 
+Nous allons d’abord procéder à la configuration du serveur **DHCP**.
+
+>  [!TIP]
+>
+> Aller dans **VM -> Send Ctrl+Alt+Del** pour déverrouiller la **VM**.
+>
+> ![image-20250316021006992](img/image-20250316021006992.png)
+
+>  [!NOTE]
+>
+> Le mot de passe est **Admin01!**
+
+Sur la VM **DHCP_DNS_SiteA**, cliquer sur **Ajouter des rôles et des fonctionnalités**.
+
+![image-20250316021339416](img/image-20250316021339416.png)L
+
+Tout laisser par défaut jusqu’à **Rôles de serveurs** puis sélectionner les deux fonctionnalités **Serveur DHCP** et **Serveur DNS**.
+
+![image-20250316021451854](img/image-20250316021451854.png)
+
+>  [!NOTE]
+>
+> Si demandé, cliquer sur Finaliser la configuration **DHCP** à partir de ce menu :<img src="img/image-20250316022510536.png" alt="image-20250316022510536" style="zoom:67%;" />
+
+Cliquer sur **Suivant** et laisser toutes les options par défaut.
+
 Nous allons déployer un **serveur 3CX** sur le **Site A**. Avant toute chose, il faut créer une licence chez **3CX** puisqu’il s’agit d’une **solution propriétaire**.
 
 [Créer un compte puis se connecter sur **3CX**.](https://login.3cx.com/Account/Login)
@@ -67,13 +93,19 @@ Cliquer sur **ADD SYSTEM**.
 
 Dans notre cas, il s’agit d’une installation **On Premise**, à savoir hébergé dans notre propre environnement.
 
-![image-20250315182627201](img/image-20250315182627201.png)
+![image-20250316021828597](img/image-20250316021828597.png)
 
-Choisissez ici un **hostname**, soit un nom pour votre serveur **3CX**.
+Choisir ici un **hostname**, soit un nom pour votre serveur **3CX**.
+
+> [!WARNING]
+>
+> Bien sélectionner **Use Your Own SSL & FQDN Certificate** car nous ne diffuserons pas *réellement* le serveur en ligne.
 
 Il y a ici un semblant de pré-configuration. Nous choisissons ici le nombre de chiffres dont les **numéros courts** seront composés.
 
-Les **numéros courts** (ou plus couramment **extensions**) sont les numéros **internes** aux utilisateurs. 
+>  [!NOTE] 
+>
+> Les **numéros courts** (ou plus couramment **extensions**) sont les numéros **internes** aux utilisateurs. 
 
 ![image-20250315182642824](img/image-20250315182642824.png)
 
@@ -83,15 +115,21 @@ Nous pouvons tout laisser par défaut ici.
 
 Une fois la licence configurée, nous choisissons la plateforme sur laquelle installer le **serveur 3CX** (choisir **Windows** ici).
 
-![image-20250315183005744](img/image-20250315183005744.png)
+![image-20250316022037359](img/image-20250316022037359.png)
+
+>  [!IMPORTANT] 
+>
+> Penser à bien noter le mot de passe.
 
 Télécharger le serveur sous format **.exe** ainsi que le fichier de configuration proposé à **l’étape 3**. 
 
-Sur la **VM**
-
-
+Sur la VM **3CX_SiteA**, installer le **3CXPhoneSystem** et choisir la **configuration web**.
 
 ![image-20250315184619730](img/image-20250315184619730.png)
+
+Suivre le guide d’installation puis y **importer le fichier de configuration**.
+
+Une fois la configuration importée, nous pouvons accéder à l’interface web de **3CX** via le **FQDN** que nous avons renseigné lors de la création de la licence. 
 
 
 
