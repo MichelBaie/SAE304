@@ -45,9 +45,13 @@ Penser à bien désactiver le service **DHCP** (nous en déploierons un par site
 
 Pour le **LAN_Switch**, spécifiez le réseau en **Bridged** vers l’interface réseau de votre **PC** qui sera branché sur le **switch**.
 
-Maintenant que tous les réseaux sont configurés, nous allons les configurer sur les **machines virtuelles**.
+Maintenant que tous les réseaux sont configurés, <u>il faut les ajouter sur les **machines virtuelles (VM)**</u>.
 
+#### Exemple sur la VM Stormshield Site A
 
+![image-20250316002340606](img/image-20250316002340606.png)
+
+Ici, on aura une interface dans le réseau **WAN** et l’autre dans le **LAN_SiteA**.
 
 ## Configuration du Site A
 
@@ -82,6 +86,8 @@ Une fois la licence configurée, nous choisissons la plateforme sur laquelle ins
 ![image-20250315183005744](img/image-20250315183005744.png)
 
 Télécharger le serveur sous format **.exe** ainsi que le fichier de configuration proposé à **l’étape 3**. 
+
+Sur la **VM**
 
 
 
