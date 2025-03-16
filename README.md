@@ -69,17 +69,48 @@ Nous allons d’abord procéder à la configuration du serveur **DHCP**.
 
 Sur la VM **DHCP_DNS_SiteA**, cliquer sur **Ajouter des rôles et des fonctionnalités**.
 
-![image-20250316021339416](img/image-20250316021339416.png)L
+![image-20250316022729610](img/image-20250316022729610.png)L
 
 Tout laisser par défaut jusqu’à **Rôles de serveurs** puis sélectionner les deux fonctionnalités **Serveur DHCP** et **Serveur DNS**.
 
-![image-20250316021451854](img/image-20250316021451854.png)
+![image-20250316022720109](img/image-20250316022720109.png)
+
+Cliquer sur **Suivant** et laisser toutes les options par défaut.
+
+
 
 >  [!NOTE]
 >
-> Si demandé, cliquer sur Finaliser la configuration **DHCP** à partir de ce menu :<img src="img/image-20250316022510536.png" alt="image-20250316022510536" style="zoom:67%;" />
+> Si demandé, cliquer sur Finaliser la configuration **DHCP** à partir de ce menu :<img src="img/image-20250316022750048.png" alt="image-20250316022750048" style="zoom:67%;" />
 
-Cliquer sur **Suivant** et laisser toutes les options par défaut.
+Nous allons maintenant configurer le service **DHCP** : ![image-20250316022831604](img/image-20250316022831604.png)
+
+
+
+Cliquer droit sur **IPv4** et sélectionner **Nouvelle étendue**
+Cela nous permettra de créer une **pool DHCP**.
+
+![image-20250316023021507](img/image-20250316023021507.png)
+
+Donner un nom à l’étendue (p. ex: **sitea.local**) : 
+
+![image-20250316023148591](img/image-20250316023148591.png)
+
+Attribuer la plage d’adresse **192.168.1.100 -> 192.168.1.200**. Le masque sera **255.255.255.0 (/24 CIDR)**
+
+ ![image-20250316023318051](img/image-20250316023318051.png)
+
+Nous allons configurer dès maintenant les **options DHCP**.
+
+- **Routeur (passerelle par défaut) : <u>192.168.1.254</u>**
+- **Domaine parent : <u>sitea.local</u>**
+- **Adresse IP du serveur DNS : <u>192.168.1.20</u>**
+
+Activer **l’étendue**.
+
+Le service **DHCP** est maintenant opérationnel.
+
+
 
 Nous allons déployer un **serveur 3CX** sur le **Site A**. Avant toute chose, il faut créer une licence chez **3CX** puisqu’il s’agit d’une **solution propriétaire**.
 
