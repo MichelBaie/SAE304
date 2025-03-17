@@ -53,7 +53,7 @@ Maintenant que tous les réseaux sont configurés, <u>il faut les ajouter sur le
 
 Ici, nous aurons une interface dans le réseau **WAN** et l’autre dans le **LAN_SiteA**.
 
-## Configuration du Site A
+## Configuration du Site A (3CX)
 
 >  [!CAUTION]
 >
@@ -256,7 +256,7 @@ L’interface de **3CX** est disponible sur le port **5015** à l’adresse : ht
 
 Suivre le guide d’installation et y **importer le fichier de configuration**.
 
-Le **serveur 3CX** vous demandera un **certificat** et une **clé privée**. Pour se faire, allez sur votre hôte **Debian** et exécutez la commande : 
+Le **serveur 3CX** vous demandera un **certificat** et une **clé privée**. Pour ce faire, allez sur votre hôte **Debian** et exécutez la commande : 
 
 ```bash
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/C=FR/ST=Ile-de-France/L=Villetaneuse/O=USPN/CN=HOSTNAME.sitea.local" -keyout private.key  -out certificate.crt
@@ -330,7 +330,7 @@ Renseignez les informations relatives à votre nouvel utilisateur.
 >
 > L’extension représente le numéro court de l’utilisateur - le numéro que les autres utilisateurs **internes** composeront.
 >
-> Notez que le **numéro SDA** (***S**élection **D**irecte à **l’A**rrivée*) représente le **numéro long** - le numéro que les autres utilisateurs **externes** (via un **Trunk SIP** que nous configurerons plus tard) composeront.
+> Notez que le **numéro SDA** (***S**élection **D**irecte à l’**A**rrivée*) représente le **numéro long** - le numéro que les autres utilisateurs **externes** (via un **Trunk SIP** que nous configurerons plus tard) composeront.
 
 ### Configuration du Softphone
 
@@ -350,3 +350,202 @@ Il sera ainsi affiché les identifiants de connexion pour votre **softphone**.
 >
 > Notez ces identifiants pour la configuration du **softphone**.![image-20250317004512944](img/image-20250317004512944.png)
 
+Nous allons maintenant configurer ce **profil** dans un **softphone**.
+
+Sur la **VM Client1_Site_A**, ouvrez **3CX Phone**.
+
+![image-20250317111456734](img/image-20250317111456734.png)
+
+Configurez le **profil** sur **3CX Phone** comme indiqué par **3CX** : ![image-20250317111708501](img/image-20250317111708501.png)
+
+Lorsque votre **softphone** affiche **On Hook**, le profil est fonctionnel : ![image-20250317112132437](img/image-20250317112132437.png)
+
+Tentez d’appeler votre messagerie au **999** pour tester.
+
+Sur **Wireshark**, nous constatons bien l’enregistrement **SIP** du **softphone**.
+
+> [!TIP]
+>
+> Utilisez le **Graphique des flux** pour visualiser le **flux SIP** ou **RTP**.![image-20250317112826001](img/image-20250317112826001.png)
+>
+> Filtrez les paquets pour n’afficher que **SIP**.![image-20250317113135530](img/image-20250317113135530.png)
+
+Réalisez à nouveau la procédure pour configurer un **deuxième utilisateur** et configurez le **softphone** cette fois sur la **VM Client2_Site_A**.
+
+Tentez un appel entre les deux softphones.
+
+### Configuration d’un Yealink T42U
+
+
+
+## Configuration du Site B (FreePBX)
+
+Nous passons maintenant au second site. Nous allons, comme pour le Site A configurer le **serveur DHCP - DNS**.
+
+Nous allons ici utiliser le service **dnsmasq**.
+
+Dans la **VM FreePBX**, éditez le fichier */etc/dnsmasq.conf* avec cette configuration : 
+
+```bash
+## LAN SITE_B ##
+
+# DHCP #
+log-dhcp
+dhcp-range=192.168.2.100,192.168.2.200,12h
+dhcp-option=option:netmask,255.255.255.0
+dhcp-option=option:router,192.168.2.1
+dhcp-option=option:dns-server,192.168.2.20
+dhcp-option=option:domain-name,siteb.local
+
+dhcp-host=<MAC_de_FREEPBX>,192.168.2.254 #Sous le format : 0a:1b:2c:3d:4e:5f
+dhcp-host=<MAC_de_STORMSHIELD_SITE_B>,192.168.2.1 #Sous le format : 0a:1b:2c:3d:4e:5f
+
+# DNS #
+
+domain-needed
+bogus-priv
+strict-order
+domain=siteb.local
+expand-hosts
+
+address=/stormshield.siteb.local/192.168.2.1
+address=/freepbx.siteb.local/192.168.2.254
+address=/dns.siteb.local/192.168.2.20
+address=/dhcp.siteb.local/192.168.2.20
+address=/<FQDN_de_3CX>,1.2.3.1
+```
+
+Redémarrez ensuite le service **dnsmasq** :
+
+```bash
+systemctl restart dnsmasq
+```
+
+
+
+### Installation de FreePBX
+
+**Exécutez** `sudo su -`.
+
+**Téléchargez** et **exécutez** le script officiel :
+
+```bash
+wget https://github.com/FreePBX/sng_freepbx_Debian_install/raw/master/sng_freepbx_Debian_install.sh -O /tmp/sng_freepbx_Debian_install.sh
+bash /tmp/sng_freepbx_Debian_install.sh
+```
+
+​    
+
+1. [![image-20250315141143324](img/image-20250315141143324.png)](https://github.com/MichelBaie/SAE303/blob/main/img/image-20250315141143324.png)
+
+Le script procède à l’installation d’**Asterisk** et **FreePBX**. À l’issue, une **adresse IP** sera indiquée pour accéder à l’interface d’admin.
+
+#### Configuration initiale de FreePBX
+
+1. **Ouvrir un navigateur web** et aller sur `http://192.168.1.254/`.
+
+   [![image-20250315144016918](img/image-20250315144016918.png)](https://github.com/MichelBaie/SAE303/blob/main/img/image-20250315144016918.png)
+
+2. **Définir** les identifiants administrateur et le nom du serveur.
+
+3. **Passer l’interface** en **Français**.
+
+4. **Ignorer** les propositions commerciales.
+
+5. **Appliquer** la configuration en cliquant sur “Apply Config”.
+
+[![image-20250315145408133](img/image-20250315145408133.png)](https://github.com/MichelBaie/SAE303/blob/main/img/image-20250315145408133.png)
+
+### Création des lignes SIP
+
+
+
+1. Dans l’interface FreePBX, aller dans **Connectivité > Postes**.
+
+   [![image-20250315152623215](img/image-20250315152623215.png)](https://github.com/MichelBaie/SAE303/blob/main/img/image-20250315152623215.png)
+
+2. **Ajouter un poste SIP [chan_pjsip]**.
+
+   [![image-20250315153348110](img/image-20250315153348110.png)](https://github.com/MichelBaie/SAE303/blob/main/img/image-20250315153348110.png)
+
+3. **Renseigner** :
+
+   - **Extension Utilisateur** (numéro SIP).
+   - **Nom affiché** (alias).
+   - **Secret** (mot de passe).
+
+   [![image-20250315155008665](img/image-20250315155008665.png)](https://github.com/MichelBaie/SAE303/blob/main/img/image-20250315155008665.png)
+
+4. **Soumettre** puis **Appliquer la configuration**.
+
+   [![image-20250315155456600](img/image-20250315155456600.png)](https://github.com/MichelBaie/SAE303/blob/main/img/image-20250315155456600.png)
+
+5. **Faire de même** pour avoir **2 lignes SIP**.
+
+### Connexion d’un client SIP (Softphone Linphone)
+
+**Linphone** est un **softphone** libre disponible sous Linux.
+
+1. **Installer** Linphone :
+
+   ```
+   sudo apt update
+   sudo apt install linphone -y
+   ```
+
+   ​    
+
+2. Lancer Linphone et **connecter un compte SIP** :
+
+- **Nom d’utilisateur** = Extension SIP (ex. 100).
+- **Nom d’affichage** = Alias.
+- **Domaine SIP** = 192.168.1.1.
+- **Mot de passe** = Secret SIP.
+- **Transport** = UDP (5060).
+
+[![image-20250315163216375](img/image-20250315163216375.png)](https://github.com/MichelBaie/SAE303/blob/main/img/image-20250315163216375.png)
+
+**Une fois connecté**, **Linphone** doit passer en **vert** en **haut à gauche** :
+
+[![image-20250315163711564](img/image-20250315163711564.png)](https://github.com/MichelBaie/SAE303/blob/main/img/image-20250315163711564.png)
+
+1. **Tester** en appelant `*97` (boîte vocale d’Asterisk).
+
+[![image-20250315163850005](img/image-20250315163850005.png)](https://github.com/MichelBaie/SAE303/blob/main/img/image-20250315163850005.png)
+
+
+
+Warning
+
+Si un mauvais mot de passe SIP est saisi, **Fail2Ban** peut bannir votre IP. Sur le serveur FreePBX :
+
+- Lister les bannissements : `fail2ban-client banned`
+- Débannir tous : `fail2ban-client unban --all`
+
+### II 4.5. Connexion d’un téléphone Yealink T42U
+
+
+
+*Cette partie s’appuie grandement sur le [cours](https://github.com/MichelBaie/SAE303/blob/main/pdf/R316-ROM-cours.pdf) et [TPs](https://github.com/MichelBaie/SAE303/blob/main/pdf/R316-ROM-tp.pdf) de [Mr. Sami Evangelista](https://lipn.fr/~evangelista/)*
+
+Les téléphones Yealink s’utilisent souvent en entreprise. Pour les configurer il faut :
+
+1. **Réinitialiser** le téléphone en mode usine (maintenir OK, valider la remise à zéro).
+
+2. Configurer statiquement
+
+    l’IPv4 dans le menu “3  Settings -> 2 Advanced Settings (password = admin) -> 2 Network  -> 1 WAN Port -> 2 Static IPv4 Client”
+
+   - **Adresse IP** : 192.168.1.3/24
+   - **Passerelle** : 192.168.1.1 (IP du FreePBX)
+
+3. Activer la ligne SIP
+
+    dans “3 Settings -> 2 Advanced Settings -> 1 Accounts -> 1.”
+
+   - **Display Name** : Nom de l’appelant
+   - **Register Name + User Name** = Numéro SIP
+   - **Password** = Mot de passe SIP
+   - **SIP Server 1** : 192.168.1.1
+
+4. **Sauvegarder** et **tester** en appelant `*97`.
