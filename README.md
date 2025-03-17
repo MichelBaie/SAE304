@@ -226,9 +226,9 @@ Téléchargez le serveur sous format **.exe** ainsi que le fichier de configurat
 
 >  [!CAUTION]
 >
-> Lors de la première configuration de la **VM 3CX**, il est nécessaire que la **VM** aie un accès à Internet pour qu’elle puisse activer le **FQDN** auprès de 3CX.
+> Lors de la première configuration de la **VM 3CX**, il est nécessaire que la **VM** ait un accès à Internet pour qu’elle puisse activer le **FQDN** auprès de 3CX.
 >
-> <u>Configurer temporairement la carte réseau en **NAT** (Il faut donc que la machine hôte aie un accès internet également.)</u>
+> <u>Configurer temporairement la carte réseau en **NAT** (Il faut donc que la machine hôte ait un accès internet également.)</u>
 >
 > ![image-20250316220234709](img/image-20250316220234709.png)
 >
@@ -376,6 +376,48 @@ Tentez un appel entre les deux softphones.
 
 ### Configuration d’un Yealink T42U
 
+Pour configurer cette fois-ci un poste physique, ici un **Yealink T42U**,
+
+Allez dans **Utilisateurs -> Configurer un téléphone IP**
+
+![image-20250317145727377](img/image-20250317145727377.png)
+
+Spécifiez le modèle du poste ainsi que son **adresse MAC**.
+
+![image-20250317145757923](img/image-20250317145757923.png)
+
+![image-20250317145832300](img/image-20250317145832300.png)
+
+> [!CAUTION] 
+>
+> Pour l’**auto-provisioning**, bien spécifier **l’interface réseau** avec d’adresse IP et non le FQDN pour obtenir un lien de provisioning en **HTTP**. 
+>
+> *Si nous laissons en **HTTPS**, le poste renverra une erreur suite au certificat invalide.*
+
+### Auto-provisioning :
+
+Lors du démarrage du poste, il ira consulter le **lien de provisioning** en y ajoutant en **URI** : **adresseMAC.cfg** afin qu’il récupère sa configuration auprès du **serveur 3CX**. Pour que le poste ait connaissance de ce lien de provisioning, on la renseigne dans les **options DHCP**.
+
+Sur le **serveur DHCP**, ajoutez dans l’étendue l’**option 66** votre lien de provisioning.
+
+![image-20250317151515912](img/image-20250317151515912.png)
+
+> [!CAUTION]
+>
+> Prenez soin de rajouter un “/” à la fin du lien de provisioning.
+
+> [!WARNING]  
+>
+> À ce stade, pour tester le bon fonctionnement du provisioning, il est nécessaire de passer vos **VM** (**DHCP/DNS** et **3CX**) sur le réseau **LAN_Switch** afin d’avoir un accès par pont à l’interface de votre **PC Hôte**. Il faut évidemment tout relier via un **switch**.
+
+N’hésitez pas à vérifier avec **Wireshark** sur votre **VM 3CX** si le poste récupère bien sa configuration en **TFTP**.
+
+> [!NOTE] 
+>
+> **TFTP** (**T**rivial **F**ile Transfer **P**rotocol) utilise le port **UDP 69** et ne gère pas nativement l’authentification. D’où l’importance de le restreindre au LAN.
+
+Si la configuration a bien été récupérée, vous devriez trouver votre poste dans un état similaire : ![image-20250317152130876](img/image-20250317152130876.png)
+
 
 
 ## Configuration du Site B (FreePBX)
@@ -444,7 +486,7 @@ Le script procède à l’installation d’**Asterisk** et **FreePBX**. À l’i
 
 1. **Ouvrir un navigateur web** et aller sur `http://192.168.1.254/`.
 
-   [![image-20250315144016918](img/image-20250315144016918.png)](https://github.com/MichelBaie/SAE303/blob/main/img/image-20250315144016918.png)
+   ![image-20250317144334622](img/image-20250317144334622.png)
 
 2. **Définir** les identifiants administrateur et le nom du serveur.
 
@@ -486,7 +528,7 @@ Le script procède à l’installation d’**Asterisk** et **FreePBX**. À l’i
 
 **Linphone** est un **softphone** libre disponible sous Linux.
 
-1. **Installer** Linphone :
+1. **Installer** **Linphone** :
 
    ```
    sudo apt update
@@ -495,7 +537,7 @@ Le script procède à l’installation d’**Asterisk** et **FreePBX**. À l’i
 
    ​    
 
-2. Lancer Linphone et **connecter un compte SIP** :
+2. Lancer **Linphone** et **connecter un compte SIP** :
 
 - **Nom d’utilisateur** = Extension SIP (ex. 100).
 - **Nom d’affichage** = Alias.
@@ -515,14 +557,7 @@ Le script procède à l’installation d’**Asterisk** et **FreePBX**. À l’i
 
 
 
-Warning
-
-Si un mauvais mot de passe SIP est saisi, **Fail2Ban** peut bannir votre IP. Sur le serveur FreePBX :
-
-- Lister les bannissements : `fail2ban-client banned`
-- Débannir tous : `fail2ban-client unban --all`
-
-### II 4.5. Connexion d’un téléphone Yealink T42U
+### Connexion d’un téléphone Yealink T42U
 
 
 
@@ -549,3 +584,12 @@ Les téléphones Yealink s’utilisent souvent en entreprise. Pour les configure
    - **SIP Server 1** : 192.168.1.1
 
 4. **Sauvegarder** et **tester** en appelant `*97`.
+
+
+
+> [!WARNING] 
+>
+> Si un mauvais mot de passe SIP est saisi, **Fail2Ban** peut bannir votre IP. Sur le serveur FreePBX :  
+>
+> - Lister les bannissements : `fail2ban-client banned`  
+> - Débannir tous : `fail2ban-client unban --all`
