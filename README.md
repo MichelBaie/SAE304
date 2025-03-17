@@ -349,3 +349,4 @@ Il sera ainsi affiché les identifiants de connexion pour votre **softphone**.
 > [!NOTE] 
 >
 > Notez ces identifiants pour la configuration du **softphone**.![image-20250317004512944](img/image-20250317004512944.png)
+
