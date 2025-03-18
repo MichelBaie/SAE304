@@ -736,5 +736,7 @@ Réalisez la même chose sur le **pare-feu Stormshield** du **Site B**:
 
 ## Configuration des trunks SIP
 
+Pour interconnecter les deux sites, il faut configurer sur chaque **PBX** un **Trunk SIP**
 
+![image-20250318221605923](img/image-20250318221605923.png)
 
