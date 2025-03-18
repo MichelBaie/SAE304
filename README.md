@@ -394,7 +394,31 @@ Spécifiez le modèle du poste ainsi que son **adresse MAC**.
 >
 > *Si nous laissons en **HTTPS**, le poste renverra une erreur suite au certificat invalide.*
 
-### Auto-provisioning :
+### Connexion d’un téléphone Yealink T42U
+
+
+
+*Cette partie s’appuie grandement sur le [cours](https://github.com/MichelBaie/SAE303/blob/main/pdf/R316-ROM-cours.pdf) et [TPs](https://github.com/MichelBaie/SAE303/blob/main/pdf/R316-ROM-tp.pdf) de [Mr. Sami Evangelista](https://lipn.fr/~evangelista/)*
+
+Les téléphones Yealink s’utilisent souvent en entreprise. Pour les configurer il faut :
+
+1. **Réinitialiser** le téléphone en mode usine (maintenir OK, valider la remise à zéro).
+
+2. Activer la ligne SIP
+
+   dans “3 Settings -> 2 Advanced Settings -> 1 Accounts -> 1.”
+
+   - **Display Name** : Nom de l’appelant
+   - **Register Name(Auth_name)** : ID d’authentification
+   - **Username** : Numéro d’extension
+   - **Password** = Mot de passe SIP
+   - **SIP Server 1** : 192.168.1.254
+
+3. **Sauvegarder** et **tester** en appelant `999`.
+
+
+
+### *Bonus - Auto-provisioning des Yealink :*
 
 Lors du démarrage du poste, il ira consulter le **lien de provisioning** en y ajoutant en **URI** : **adresseMAC.cfg** afin qu’il récupère sa configuration auprès du **serveur 3CX**. Pour que le poste ait connaissance de ce lien de provisioning, on la renseigne dans les **options DHCP**.
 
@@ -421,6 +445,8 @@ Si la configuration a bien été récupérée, vous devriez trouver votre poste 
 
 
 ## Configuration du Site B (FreePBX)
+
+### Configuration du DHCP - DNS
 
 Nous passons maintenant au second site. Nous allons, comme pour le Site A configurer le **serveur DHCP - DNS**.
 
@@ -498,9 +524,9 @@ Le script procède à l’installation d’**Asterisk** et **FreePBX**. À l’i
 
 [![image-20250315145408133](img/image-20250315145408133.png)](https://github.com/MichelBaie/SAE303/blob/main/img/image-20250315145408133.png)
 
+
+
 ### Création des lignes SIP
-
-
 
 1. Dans l’interface FreePBX, aller dans **Connectivité > Postes**.
 
@@ -559,20 +585,11 @@ Le script procède à l’installation d’**Asterisk** et **FreePBX**. À l’i
 
 ### Connexion d’un téléphone Yealink T42U
 
-
-
 *Cette partie s’appuie grandement sur le [cours](https://github.com/MichelBaie/SAE303/blob/main/pdf/R316-ROM-cours.pdf) et [TPs](https://github.com/MichelBaie/SAE303/blob/main/pdf/R316-ROM-tp.pdf) de [Mr. Sami Evangelista](https://lipn.fr/~evangelista/)*
 
 Les téléphones Yealink s’utilisent souvent en entreprise. Pour les configurer il faut :
 
 1. **Réinitialiser** le téléphone en mode usine (maintenir OK, valider la remise à zéro).
-
-2. Configurer statiquement
-
-    l’IPv4 dans le menu “3  Settings -> 2 Advanced Settings (password = admin) -> 2 Network  -> 1 WAN Port -> 2 Static IPv4 Client”
-
-   - **Adresse IP** : 192.168.1.3/24
-   - **Passerelle** : 192.168.1.1 (IP du FreePBX)
 
 3. Activer la ligne SIP
 
@@ -581,7 +598,7 @@ Les téléphones Yealink s’utilisent souvent en entreprise. Pour les configure
    - **Display Name** : Nom de l’appelant
    - **Register Name + User Name** = Numéro SIP
    - **Password** = Mot de passe SIP
-   - **SIP Server 1** : 192.168.1.1
+   - **SIP Server 1** : 192.168.2.254
 
 4. **Sauvegarder** et **tester** en appelant `*97`.
 
@@ -593,3 +610,131 @@ Les téléphones Yealink s’utilisent souvent en entreprise. Pour les configure
 >
 > - Lister les bannissements : `fail2ban-client banned`  
 > - Débannir tous : `fail2ban-client unban --all`
+
+### *Bonus : Auto-Provisioning des Yealink*
+
+De la même manière que pour le **Site A**, il faut configurer un serveur **TFTP** qui contiendra les fichiers de configuration dont leur noms sera leur adresse **MAC**.
+
+Créez un dossier **/var/tftp**
+
+```bash
+mkdir /var/tftp
+```
+
+Sur la **VM DHCP_DNS_Site_B**, Ajouter à la fin du fichier de configuration de **dnsmasq** : 
+
+```bash
+# TFTP #
+enable-tftp
+tftp-root=/var/tftp
+```
+
+Redémarrez le service **dnsmasq** :
+
+```bash
+systemctl restart dnsmasq
+```
+
+Pour chaque téléphone, créez un fichier dont son nom sera **<MAC_du_poste>**.cfg dans **/var/tftp** dont le contenu sera ainsi :
+
+```
+#!version:1.0.0.1
+account.1.enable = 1
+account.1.label = <Numéro SIP>
+account.1.display_name = <Nom du compte>
+account.1.auth_name = <Numéro SIP>
+account.1.user_name = <Numéro SIP>
+account.1.pasword = <Mot de passe SIP>
+account.1.sip_server.1.address = <IP du FreePBX>
+lang.gui = French
+```
+
+Redémarrez le poste et testez en appelant la messagerie au ```*97```.
+
+## Configuration des pare-feux Stormshield
+
+Nous allons déployer un **pare-feu Stormshield** par site.
+
+Pour ce faire, attribuez sur les deux interfaces de la **VM Stormshield Site A** le **LAN_SiteA** et **WAN**
+
+![image-20250318151625334](img/image-20250318151625334.png)
+
+Faites de même pour le **Stormshield Site B** :
+
+![image-20250318152009621](img/image-20250318152009621.png)
+
+> [!WARNING] 
+>
+> Prenez soin à bien respecter l’ordre des interfaces telles que les captures d’écran.
+
+>  [!CAUTIOn]
+>
+> Lors du démarrage des **pare-feux**, prenez soin d’avoir les **serveurs DHCP** et vérifiez que l’une des deux interfaces prend bien son **adresse IP** réservée (**192.168.(1/2).1**)
+>
+> De plus, vérifiez bien sur les interfaces affichées par le **terminal de la VM Stormshield** attribue bien votre **adresse IP du LAN_Site B** en **in** et l’autre  (normalement en **APIPA** (*169.254.xxx.xxx*) en **out**). Si ce n’est pas le cas, éteignez votre **VM** et intervertissez les interfaces.
+
+L’interface de **Stormshield** est accessible via ```https://192.168.(1/2).1```.
+
+>  [!TIP]
+>
+> Si vous avez du mal à accéder à l’interface de **Stormshield** mais qu’il répond bien aux pings, tentez cette **URL** : ```https://192.168.1.1/admin/admin.html```
+
+Les identifiants sont : ```admin:<PASSWORD_DEFINI_LORS_DE_L'INSTALLATION```
+
+### Configuration des interfaces
+
+Configurez ainsi les interfaces **OUT **dans** **RÉSEAU -> Interfaces** :
+
+**Site A : **![image-20250318153651996](img/image-20250318153651996.png)
+
+**Site B : ** ![image-20250318153711992](img/image-20250318153711992.png)
+
+
+
+### Configuration du routage
+
+Dans **RÉSEAU -> Routage**, configurez la route par défaut pour la diriger vers le **routeur distant**.
+**Stormshield** étant un **NGFW** (**N**ext-**G**eneration **F**ire**w**all), il fonctionne avec des **objets**.
+
+Par exemple, au lieu de définir une simple adresse IP en route par défaut, nous définissons un **objet** de type **machine**. Cet objet contient des caractéristiques telle qu’une **adresse IP**.
+
+**Créez** un objet pour caractériser le **routeur du Site B** : ![image-20250318154216745](img/image-20250318154216745.png)
+
+
+
+N’oubliez pas d’**appliquer** une fois ceci fait.
+
+### Configuration du filtrage 
+
+Dans **POLITIQUE DE SÉCURITÉ -> Filtrage et NAT**, créez des règles pour obtenir ceci.![image-20250318154457317](img/image-20250318154457317.png)
+
+Il faudra ici créer un objet **3CX** et **RTP** (il s’agit d’une plage de ports allant de **9000** à **10999**).
+
+Ici nous **autorisons** :
+
+- Le flux **RTP** sortant/entrant.
+- Le flux **HTTPS** sortant/entrant.
+- Le flux **ICMP** sortant/entrant. (**Doit être désactivé en pratique !**)
+
+Nous mettons maintenant en place la **translation d’adresses** (**NAT**).![image-20250318160700922](img/image-20250318160700922.png)
+
+Tous les paquets **sortants** auront l’adresse IP **publique** du pare-feu. (**SNAT**)
+
+Tous les paquets **SIP** ou **RTP** entrants seront redirigés vers le **serveur 3CX**. (**DNAT**)
+
+
+
+Réalisez la même chose sur le **pare-feu Stormshield** du **Site B**:
+
+**Routage par défaut : **![img](img/AGV_vUeB9LpfDZ4-XyLmYdB3L7uKV1zuOyjyy86fEtaMoaOVdRALvic1lid5qEJv99JilROA-MEUNxvgTZnpnOZe20nZB4ux60DnvRTo2y-ZT6HIDFEZC1QQH3zp7-7p_-clt-FFPu_KnA=s2048.png)
+
+**Filtrage : **![img](img/AGV_vUdo7THprLbpAmjY8EHdQnXlcighR2GB3QV5UFWfLQs3f7CFiPrhxk8g6xZmdB7rtyBxpn56y-WDaBEcK9tTU8c9g4YjDALlg2s8lToQPZaJiJjIN7BUu0DiILMJJE6WZ1age1CdEQ=s2048.png)
+
+**NAT :** ![img](img/AGV_vUdWvg_GFkeDzs8GeJGVpwrbruWV58EvgDw573D2bXbyaKs3gamob-15r6RlATrRCNfYhiqkukheckmzXTI8qoZOiBhA_AIClZmgzoNxJpZwcQMoDHvqdbn0miSfTd7vch32q8qovA=s2048.png)
+
+
+
+## Configuration des trunks SIP
+
+
+
