@@ -1,10 +1,46 @@
-# SAE304 - Déployer un service de téléphonie multi-sites
+# SAÉ304 - Déployer un service de téléphonie multi-sites
 
-Cette SAÉ a été réalisée dans le cadre de notre deuxième année de BUT Réseaux et Télécommunications, parcours Réseaux Opérateurs Multimédia, au sein de l’IUT de Villetaneuse.
+*La dernière version de ce sujet de SAÉ est disponible sur le lien GitHub suivant : [SAE304](https://github.com/MichelBaie/SAE304)*
+
+**Rédigé par :** Jack-Alexander CORRÊA DO CARMO et Tristan BRINGUIER
+**Sujet initial :** Mr. Mohamed Amine Ouamri et Mme. Yamina Amzal
+**Contexte :** Réalisé dans le cadre de la deuxième année  de BUT Réseaux et Télécommunications, parcours Réseaux Opérateurs  Multimédia à l’IUT de Villetaneuse
+
+# Table des matières
+
+1. [SAE304 - Déployer un service de téléphonie multi-sites](#sae304---d%C3%A9ployer-un-service-de-t%C3%A9l%C3%A9phonie-multi-sites)
+2. [Introduction](#introduction)
+3. [Pré-requis](#pr%C3%A9-requis)
+4. [Infrastructure déployée](#infrastructure-d%C3%A9ploy%C3%A9e)
+5. [Configuration réseau des machines virtuelles](#configuration-r%C3%A9seau-des-machines-virtuelles)
+6. [Configuration du Site A (3CX)](#configuration-du-site-a-3cx)
+   1. [Configuration du DHCP](#configuration-du-dhcp)
+   2. [Configuration du DNS](#configuration-du-dns)
+   3. [Configuration du serveur 3CX](#configuration-du-serveur-3cx)
+   4. [Ajout d’extensions](#ajout-dextensions)
+   5. [Configuration du Softphone](#configuration-du-softphone)
+   6. [Configuration d’un Yealink T42U](#configuration-dun-yealink-t42u)
+7. [Configuration du Site B (FreePBX)](#configuration-du-site-b-freepbx)
+   1. [Configuration du DHCP - DNS](#configuration-du-dhcp---dns)
+   2. [Installation de FreePBX](#installation-de-freepbx)
+   3. [Configuration initiale de FreePBX](#configuration-initiale-de-freepbx)
+   4. [Création des lignes SIP](#cr%C3%A9ation-des-lignes-sip)
+   5. [Connexion d’un client SIP (Softphone Linphone)](#connexion-dun-client-sip-softphone-linphone)
+   6. [Connexion d’un téléphone Yealink T42U](#connexion-dun-t%C3%A9l%C3%A9phone-yealink-t42u)
+8. [Configuration des pare-feux Stormshield](#configuration-des-pare-feux-stormshield)
+9. [Configuration des trunks SIP](#configuration-des-trunks-sip)
+   1. [Trunk sur 3CX](#trunk-sur-3cx)
+   2. [Trunk sur FreePBX](#trunk-sur-freepbx)
+10. [BONUS : Approfondissement des fonctionnalités](#bonus--approfondissement-des-fonctionnalit%C3%A9s)
+    1. [SVI](#svi)
+    2. [Groupements d’appels](#groupements-dappels)
+    3. [Client Web](#client-web)
+
+
 
 ## Introduction
 
-Rédiger une introduction
+Cette SAÉ présente le déploiement d'un service de téléphonie multi-sites dans le cadre de notre formation en Réseaux et Télécommunications. L'objectif est de configurer et de déployer une infrastructure téléphonique interconnectée entre deux sites, en utilisant des solutions comme 3CX et FreePBX, tout en assurant la gestion des réseaux, du DHCP, du DNS, et des équipements tels que les téléphones Yealink et les softphones.
 
 ## Pré-requis
 
@@ -444,6 +480,12 @@ Si la configuration a bien été récupérée, vous devriez trouver votre poste 
 
 
 
+>  [!NOTE]
+>
+> Lorsque l’on analyse les **trames Wireshark** entre deux postes, nous constatons que le **flux RTP**, contrairement au **flux SIP** qui passe par l’**IPBX**, est direct entre les deux équipements.
+
+
+
 ## Configuration du Site B (FreePBX)
 
 ### Configuration du DHCP - DNS
@@ -651,6 +693,10 @@ lang.gui = French
 
 Redémarrez le poste et testez en appelant la messagerie au ```*97```.
 
+> [!NOTE] 
+>
+> Nous avions remarqué que sur **3CX**, le **flux RTP** était direct entre deux équipements du même site mais ce n’est pas le cas ici, il transite via l’**IPBX** malgré l’option par défaut **Direct Media** qui propose de communiquer en direct. Cela est due à la manière dont **FreePBX** gère le flux pour proposer des services tels que le **Call recording**, les **transferts d’appels**, etc…
+
 ## Configuration des pare-feux Stormshield
 
 Nous allons déployer un **pare-feu Stormshield** par site.
@@ -736,7 +782,189 @@ Réalisez la même chose sur le **pare-feu Stormshield** du **Site B**:
 
 ## Configuration des trunks SIP
 
-Pour interconnecter les deux sites, il faut configurer sur chaque **PBX** un **Trunk SIP**
+#### Trunk sur 3CX
 
-![image-20250318221605923](img/image-20250318221605923.png)
+Pour interconnecter les deux sites, il faut configurer sur chaque **PBX** un **Trunk SIP** ![image-20250318221605923](img/image-20250318221605923.png)
 
+Il faut spécifier ici le **fournisseur de trunk SIP**. Il s’agit ici du serveur distant **FreePBX** donc choisissez **Generic SIP Trunk (IP Based)** : ![image-20250319130925856](img/image-20250319130925856.png)
+
+![image-20250319131326911](img/image-20250319131326911.png)
+
+>  [!NOTE]
+>
+> - **Numéro de trunk principal** : Identifiant unique pour le trunk. Peut aussi servir de numéro **SDA**.
+> - **Registrar / Serveur** : Adresse où le trunk se connectera.
+
+![image-20250319131544192](img/image-20250319131544192.png)
+
+Vous pouvez également créer plusieurs **numéros SDA** que l’on peut attribuer à l’utilisateur souhaité dans **Utilisateurs -> <UTILISATEUR_SOUHAITÉ>**.
+
+![image-20250319131903662](img/image-20250319131903662.png)
+
+![image-20250319131953969](img/image-20250319131953969.png)
+
+>  [!NOTE]
+>
+> Le **numéro de trunk principal** peut être utilisé en tant que **SDA** pour un utilisateur.
+
+Maintenant que la connexion est établie *côté **3CX***, il faut établir des **Règles sortantes** pour définir quand sortir via le trunk.
+
+![image-20250319132122328](img/image-20250319132122328.png)
+
+![image-20250319132428874](img/image-20250319132428874.png)
+
+- **1** : Tous les numéros commençant par **20** appliqueront cette **règle sortante**.
+- **2** : Le **trunk** à emprunter si cette règle est appliquée
+- **3** : Lors de l’envoi de la requête **INVITE** (*SIP*), la règle enlèvera au numéro composé les **deux premiers chiffres**, à savoir le **”20“**.
+
+**La configuration du trunk sur 3CX est terminée.** 
+
+#### Trunk sur FreePBX
+
+Avant toute choses, attribuez un **numéro SDA **(**CID Sortant**) à vos utilisateurs : ![image-20250319135441705](img/image-20250319135441705.png)
+
+
+
+À l’instar de **3CX**, nous allons configurer le trunk sur **FreePBX**.
+
+![image-20250319133501542](img/image-20250319133501542.png)
+
+Créez un **Trunk SIP**. ![image-20250319134255196](img/image-20250319134255196.png)
+
+> [!TIP] 
+>
+> Le **Outboud CallerID** équivaut au **numéro de trunk principal** sur **3CX**.
+
+>  [!CAUTION]
+>
+> N’oubliez pas de **Soumettre** puis d’**Appliquer la configuration**.
+
+![image-20250319133720009](img/image-20250319133720009.png)
+
+Renseignez dans **pjsip Paramètres** : 
+
+- **Aucune authentification**
+- **SIP Server** : <FQDN_de_votre_3CX>
+
+Une fois le **trunk** configuré, il faut également savoir quand emprunter ce trunk. ![image-20250319134143627](img/image-20250319134143627.png)
+
+![image-20250319134415509](img/image-20250319134415509.png)
+
+Spécifiez dans **Trunk Sequence for Matched Routes** votre trunk récemment crée. 
+
+![image-20250319134452374](img/image-20250319134452374.png)
+
+Dans **Dial Patterns**, vous pourrez renseigner le préfixe à composer pour utiliser cette règle sortante. Ici, si le numéro comporte **5 chiffres** et débute par **10**, alors la règle sera appliquée.
+
+
+
+Il faut maintenant, lorsqu’on reçoit un appel entrant sur le **site FreePBX**, rediriger l’appel au bon endroit. Sur **3CX**, la route entrante était implicite lors de l’attribution des **SDA**, il n’y avait pas de menu dédié. Sur **FreePBX**, il y a cette fois un menu **Routes entrantes** : ![image-20250319134730171](img/image-20250319134730171.png)
+
+![image-20250319134834069](img/image-20250319134834069.png)
+
+Nous renseignons dans la route : 
+
+- **Le numéro DID** est la **SDA** reçue lors d’un appel entrant.
+- **Le Choix Destination** : où rediriger l’appel.
+
+Entre autres, lorsqu’un appel vers le 20200 est reçu d’un **trunk**, on le redirige vers le **Poste** (*utilisateur*) **200 Jack Corrêa**.
+
+Ainsi, la connexion inter-sites est configurée.
+
+Si vous tentez un appel, il est possible que la voix ne passe pas car **FreePBX** a une plage de ports **RTP** qui n’est pas la même que **3CX** en plus des **pare-feux** qui ne laissent passer le flux **RTP** uniquement sur la plage de **3CX**.
+
+Pour adapter la plage de ports, allez dans **Paramètres SIP d’Asterisk** ![image-20250319133953450](img/image-20250319133953450.png)
+
+ 
+
+Profitez en pour préciser vos réseaux pour le **NAT** : ![image-20250319134020393](img/image-20250319134020393.png)
+
+
+
+Enfin, attribuez la plage de ports **RTP** de **9000** à **10999** :![image-20250319134029410](img/image-20250319134029410.png)
+
+Testez un appel inter-sites, par exemple depuis le **Site A** tentez d’appeler le **20200** et inversement. 
+
+Relevez les **trames Wireshark**, vous devriez voir le **flux SIP** et le **flux RTP** transiter du **poste** à l’**IPBX** et de l’**IPBX** au **routeur distant**.
+
+
+
+## BONUS : Approfondissement des fonctionnalités
+
+Maintenant que la communication inter-sites est opérationnelle, nous pouvons explorer davantage de fonctionnalités que **3CX** propose, tel que les **SVI** (**S**erveur **V**ocal **I**nteractif) ou bien les **groupements d’appels**.
+
+Les **SVI** sont les messages pré enregistrés qui nous proposent de faire certains choix. En fonction du **DTMF** reçu par le serveur, une action sera effectuée.
+
+Les **groupements d’appels** permettent de former des groupes d’appels. Par exemple, l’appel vers **10100** fera sonner tous les postes du groupement.
+
+Le **client Web** proposé par **3CX** si nous n’avons pas l’accès à un softphone.
+
+
+
+### SVI
+
+![img](img/AGV_vUfO_aeo3N1qg4Ybp5afTpKnAeyAP80M2zxBViRVfXs6CTrW9MuvA1GIvtKZamduOMMPxBz8deJ0CP06I1G08RTIX3rmNRbAI-O41Ai4dHNCS2srqflpIEGb1VWAnaYhLcNtMgi-FQ=s2048.png)
+
+![img](img/AGV_vUcTdMXNOVgC-t9SRrYMPhXAooUCXJaj00TIWJlS8LIDS2myhRGkFab4KfLfrnQEDhdDDA3s-S0zr1n9MLAxFNKy2WX1CjogUmVPkymOI_bUkGxFwKjNKMtnOE97D2PxbJJuLLWceQ=s2048.png)
+
+Ici, le **SVI** du **Site A** dont la **SDA** est **10111** proposera une directive (enregistrée par nos soins) et en fonction du choix (**DTMF**), l’appel sera redirigé vers l’utilisateur désiré.
+
+
+
+### Groupements d’appels
+
+![img](img/AGV_vUc2vVY-UVLRM0woD7rZfB5fmJytdqaIaN-DrQ0RgtmT4AM2BMI_V5BVXwRd1X9XCjTE2ujDX2fRLjEUb-EErMzBeCOuGsn_6POha_puGi6Zfzw1aF6wONa2t2tpPKPzwj5LhU3HNw=s2048.png)
+
+![img](img/AGV_vUdqVkL4Oedf9qYfzAbZAsps8LC17af9bqWlW__gS84Rf8JSh3-AWBn4Ied9HsyNkhTJSjtwkzOEC9uuGB0zl_iqHHlAy0LspLmcgq5yx_rayh5NxBtyriZmkc6Yn8xIW7q3PdofAw=s2048.png)
+
+![img](img/AGV_vUcZzWvlx0S8GczjBkFTVhYQmKJ-PnsJ-70RoNrv7Yxg3O8EQPouGm8BlQaVbld63tzlFvYwHJsM8T1VwgxMPV33_pp6nb_DRqqBEO1CCIPvfD7MS2kJYLReZCOhmQeGg-ZU82I3Gw=s2048.png)
+
+Dans ce **groupement d’appels**, tous les téléphones sonneront en même temps (**Ring All**) pendant **20 secondes**. Ainsi, lorsque le **10110** sera appelé, les utilisateurs **100** et **101** sonneront en même temps. 
+
+Il existe plusieurs type d’appels de groupement autre que **Ring All**.
+
+### Client Web
+
+![image-20250319141048699](img/image-20250319141048699.png)
+
+**3CX** propose différentes fonctionnalités, telle que le **Chat**, un **Annuaire** et autres. Prenez le temps de découvrir chaque fonctionnalité.
+
+
+
+### Conclusion et vérifications finales
+
+Dans cette SAÉ, nous avons conçu et déployé une solution de téléphonie multi-sites, comprenant :
+
+- Un **serveur de téléphonie IP** 3CX pour la gestion des appels et des extensions internes, ainsi qu’un **serveur FreePBX** pour interconnecter les sites.
+- Une **configuration de réseau virtuelle** via VMware pour simuler une infrastructure sécurisée entre les différents sites.
+- La gestion de **serveurs DHCP et DNS** pour assurer la connectivité entre les machines virtuelles et les périphériques réseau.
+
+Nous avons également exploré les principes de configuration des équipements physiques et logiciels, comme les **téléphones Yealink T42U** et les **softphones**, ainsi que les **trunks SIP** pour assurer la communication entre les différents sites.
+
+Avant de conclure cette SAÉ, voici les points à valider :
+
+1. Tests d’appels SIP :
+
+   - Appels internes entre différents utilisateurs (Softphone ↔ Yealink).
+   - Vérification des communications via les trunks SIP inter-sites.
+
+2. Tests de connectivité réseau :
+
+   - Vérification de la configuration des réseaux VMware (LAN, WAN, etc.).
+   - Suivi des paquets avec Wireshark pour analyser les flux SIP et RTP.
+
+3. Tests de configuration des pare-feux :
+
+   - Vérification des règles de filtrage et de NAT sur les pare-feux Stormshield.
+
+   - Test de la connectivité entre les sites à travers les pare-feux.
+
+## Références et ressources complémentaires
+
+- Site officiel Debian : [https://www.debian.org/](https://www.debian.org/)  
+- Site officiel VMware : [https://www.vmware.com/](https://www.vmware.com/)  
+- FreePBX (documentation) : [https://wiki.freepbx.org/](https://wiki.freepbx.org/)  
+- Asterisk (documentation) : [https://wiki.asterisk.org/](https://wiki.asterisk.org/)  
+- Linphone : [https://www.linphone.org/](https://www.linphone.org/)  
+- 3CX : [https://www.3cx.com/](https://www.3cx.com/)
+- Stormshield [https://www.stormshield.com/](https://www.stormshield.com/)
