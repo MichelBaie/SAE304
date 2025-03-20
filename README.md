@@ -3,7 +3,9 @@
 *La dernière version de ce sujet de SAÉ est disponible sur le lien GitHub suivant : [SAE304](https://github.com/MichelBaie/SAE304)*
 
 **Rédigé par :** Jack-Alexander CORRÊA DO CARMO et Tristan BRINGUIER
+
 **Sujet initial :** Mr. Mohamed Amine Ouamri et Mme. Yamina Amzal
+
 **Contexte :** Réalisé dans le cadre de la deuxième année  de BUT Réseaux et Télécommunications, parcours Réseaux Opérateurs  Multimédia à l’IUT de Villetaneuse
 
 # Table des matières
@@ -35,8 +37,6 @@
     1. [SVI](#svi)
     2. [Groupements d’appels](#groupements-dappels)
     3. [Client Web](#client-web)
-
-
 
 ## Introduction
 
